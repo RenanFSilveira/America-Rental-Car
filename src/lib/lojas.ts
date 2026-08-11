@@ -24,8 +24,9 @@ export type Loja = {
   /** Rótulo da ação de conversão do Google Ads desta loja. */
   sendTo: string;
   /**
-   * Termos que, se aparecerem em utm_campaign / utm_term, sobem este card.
-   * Comparação feita sem acento e em minúscula.
+   * Termos que, se aparecerem em utm_campaign ou utm_term, sobem este card.
+   * Vão para o atributo data-sinais do card e são comparados sem acento e em
+   * minúscula pelo script de destaque (routes/__root.tsx).
    */
   sinaisDeCidade: string[];
 };
@@ -73,39 +74,3 @@ export const EMPRESAS = {
   whatsapp: "5527988801118",
   sendTo: "AW-866527260/mZ5XCPrsuKUcEJzQmJ0D",
 } as const;
-
-/** Tira acento e caixa para comparar sinal de cidade vindo de UTM. */
-function normalizar(texto: string): string {
-  return texto
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase();
-}
-
-/**
- * Reordena as lojas quando a URL de entrada traz o nome de uma cidade em
- * utm_campaign ou utm_term. Sem sinal, devolve a ordem original.
- *
- * Roda no servidor e no cliente com o mesmo resultado, porque só depende da
- * query string: a ordem já sai pronta no HTML, sem salto de layout.
- */
-export function ordenarLojas(
-  parametros: Record<string, unknown>,
-  lojas: readonly Loja[] = LOJAS,
-): readonly Loja[] {
-  const sinal = normalizar(
-    [parametros["utm_campaign"], parametros["utm_term"]]
-      .filter((v): v is string => typeof v === "string")
-      .join(" "),
-  );
-
-  if (!sinal) return lojas;
-
-  const destaque = lojas.find((loja) =>
-    loja.sinaisDeCidade.some((termo) => sinal.includes(termo)),
-  );
-
-  if (!destaque) return lojas;
-
-  return [destaque, ...lojas.filter((loja) => loja.slug !== destaque.slug)];
-}

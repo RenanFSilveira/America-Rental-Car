@@ -359,7 +359,12 @@ async function testarOrigemECodigo() {
     local: localStorage.getItem("arc_origem"),
     cookie: document.cookie,
     codigo: sessionStorage.getItem("arc_codigo"),
-    primeiraLoja: document.querySelector("#lojas h3")?.textContent,
+    destacada: document
+      .querySelector('[data-loja][data-destaque="sim"]')
+      ?.getAttribute("data-loja"),
+    ordemVisual: [...document.querySelectorAll("[data-loja]")]
+      .sort((a, b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top)
+      .map((el) => el.getAttribute("data-loja")),
   }));
 
   const guardado = estado.local ? JSON.parse(estado.local) : null;
@@ -377,11 +382,14 @@ async function testarOrigemECodigo() {
     ? ok("código de atendimento no formato certo", estado.codigo)
     : falha("código de atendimento no formato certo", estado.codigo ?? "vazio");
 
-  estado.primeiraLoja?.includes("Guarapari")
-    ? ok("card da cidade da campanha sobe para o topo", estado.primeiraLoja)
+  estado.destacada === "guarapari" && estado.ordemVisual[0] === "guarapari"
+    ? ok(
+        "card da cidade da campanha sobe para o topo",
+        `ordem na tela: ${estado.ordemVisual.join(", ")}`,
+      )
     : falha(
         "card da cidade da campanha sobe para o topo",
-        estado.primeiraLoja ?? "",
+        `destacada=${estado.destacada}, ordem=${estado.ordemVisual?.join(", ")}`,
       );
 
   await aba.goto(`${ORIGEM}/?gclid=TESTE123`, { waitUntil: "networkidle2" });

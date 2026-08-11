@@ -15,8 +15,8 @@ npm start          # http://localhost:3210
 | Comando | O que faz |
 |:--|:--|
 | `npm run dev` | desenvolvimento com recarga |
-| `npm run build` | build de produção (cliente e servidor) |
-| `npm start` | sobe o build num servidor Node local, com gzip |
+| `npm run build` | build de produção e pré-renderização do HTML |
+| `npm start` | serve o build estático localmente, com gzip e cache iguais aos de produção |
 | `npm run validar` | checklist automatizado: links, tags, peso, conteúdo |
 | `npm run verificar-tags` | prova em navegador de que cada botão dispara a conversão certa |
 | `npm run imagens` | reprocessa as fotos de `.raw/` para `public/` |
@@ -31,7 +31,9 @@ npm run imagens
 
 ## Stack
 
-TanStack Start (React 19, SSR) com Tailwind 4, build em Vite, publicação em Cloudflare Workers. Todas as versões estão travadas em exato, sem `^` e sem pré-lançamento: a página fica no caminho crítico do único canal de aquisição do cliente.
+TanStack Start (React 19) com Tailwind 4 e build em Vite. Todas as versões estão travadas em exato, sem `^` e sem pré-lançamento: a página fica no caminho crítico do único canal de aquisição do cliente.
+
+O build **pré-renderiza a página em HTML estático**. O HTML sai pronto, com todo o conteúdo, só que gerado uma vez no build em vez de a cada visita. Na prática `dist/client` é um site estático: qualquer CDN entrega, sem função de servidor e sem cold start no caminho do clique pago. O React hidrata em cima desse HTML para os cliques de contato.
 
 ## Estrutura
 
@@ -55,6 +57,8 @@ O `gtag` é carregado uma vez, com Google Ads e GA4. As conversões são dispara
 
 Cada botão de contato é um `<a href>` real com o link do WhatsApp já montado no HTML servido: sem JavaScript, o clique leva ao WhatsApp do mesmo jeito. Com JavaScript, o `onClick` segura a navegação, dispara a conversão com `event_callback` e só então segue. Um tempo limite de 800 ms garante que rede lenta ou bloqueador de anúncio não prendam ninguém na página.
 
+Quando a campanha traz o nome de uma cidade em `utm_campaign` ou `utm_term`, o card daquela loja sobe para a frente e ganha uma etiqueta. Como a página é estática, quem faz isso é um script curto no fim do corpo, que marca o card antes da primeira pintura: a mudança é só de CSS, o HTML continua o mesmo que o React espera hidratar, e não há salto de layout. Os termos de cada cidade vêm de `lib/lojas.ts`, não estão escritos no script.
+
 Os parâmetros de origem (`gclid`, `wbraid`, `gbraid` e as UTMs) são **lidos da URL de entrada** e guardados em `localStorage` e num cookie primário de 90 dias. Nenhuma UTM é escrita no código. Cada sessão recebe um código curto (`AR-XXXXXXX`) que entra na mensagem do WhatsApp como protocolo de atendimento, o que permite reconciliar depois qual conversa virou locação. O código é aleatório e não carrega dado pessoal.
 
 `LOG_ENDPOINT` em `lib/config.ts` está vazio: a função de registro é no-op e a página funciona normalmente. Preenchido, passa a enviar um JSON por `navigator.sendBeacon` a cada clique de contato.
@@ -77,7 +81,7 @@ Medido no Lighthouse mobile, 4G simulado, contra o build de produção:
 
 | Métrica | Valor |
 |:--|:--|
-| Performance | 97 |
+| Performance | 96 |
 | Acessibilidade | 100 |
 | SEO | 100 |
 | LCP | 1,9 s |
@@ -88,7 +92,9 @@ Sem vídeo, sem autoplay, sem fonte externa. As fotos de frota são `webp` com `
 
 ## Publicação
 
-`wrangler.toml` está pronto para Cloudflare Workers:
+**Vercel** é a publicação principal, configurada em `vercel.json`: build com `npm run build` e saída estática em `dist/client`. Conectado ao repositório, cada push na `main` publica.
+
+**Cloudflare** funciona como alternativa, com o `wrangler.toml` da raiz:
 
 ```bash
 npm run build
@@ -97,7 +103,7 @@ npx wrangler deploy
 
 Dois cuidados antes de trocar o destino dos anúncios:
 
-1. **A URL final precisa ser um domínio da América.** Um subdomínio serve; um endereço de plataforma (`*.workers.dev`, `*.pages.dev`) não. Ajuste `SITE_URL` em `lib/config.ts` e a rota no `wrangler.toml` quando o domínio existir.
+1. **A URL final precisa ser um domínio da América.** Um subdomínio serve; um endereço de plataforma (`*.vercel.app`, `*.workers.dev`) não. Ajuste `SITE_URL` em `lib/config.ts` e o domínio na hospedagem quando ele existir.
 2. **Não rode esta página e o agregador de links antigo em paralelo** para o mesmo tráfego. As ações de conversão são primárias e contam uma por clique: manter os dois duplica conversão e suja a série histórica.
 
 ## Estado atual

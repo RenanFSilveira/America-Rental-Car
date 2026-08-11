@@ -12,10 +12,16 @@ export default defineConfig({
   },
   plugins: [
     tailwindcss(),
-    // target padrão = node-server (roda com `npm run build && npm start`).
-    // Para publicar na Cloudflare, trocar por: tanstackStart({ target: "cloudflare-module" })
-    // e usar o wrangler.toml da raiz. Ver RELATORIO.md, seção "Hospedagem".
-    tanstackStart(),
+    // A página é pré-renderizada em HTML estático no build. O SSR continua
+    // valendo: o HTML sai pronto, com o conteúdo todo, só que gerado uma vez
+    // em vez de a cada visita. Resultado: dist/client é um site estático, que
+    // qualquer CDN entrega sem função de servidor e sem cold start no caminho
+    // do clique pago. O destaque de loja por UTM, que dependia do servidor,
+    // virou um script curto no fim do corpo (routes/__root.tsx).
+    tanstackStart({
+      prerender: { enabled: true, failOnError: true },
+      pages: [{ path: "/" }],
+    }),
     viteReact(),
   ],
 });

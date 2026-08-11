@@ -47,3 +47,25 @@ body {
   outline: 3px solid var(--color-marca);
   outline-offset: 2px;
 }
+
+/*
+ * Destaque da loja que veio na campanha.
+ *
+ * Quem marca o card é o script no fim do corpo (routes/__root.tsx), que roda
+ * antes da primeira pintura. Sem marcação, os três cards ficam iguais e a
+ * etiqueta some. As regras são genéricas: acrescentar uma loja em lib/lojas.ts
+ * não exige tocar aqui.
+ */
+.etiqueta-destaque {
+  display: none;
+}
+
+.cartao-loja[data-destaque="sim"] {
+  order: -1;
+  border-color: var(--color-marca);
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--color-marca) 20%, transparent);
+}
+
+.cartao-loja[data-destaque="sim"] .etiqueta-destaque {
+  display: inline-block;
+}

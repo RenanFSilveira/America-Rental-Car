@@ -37,7 +37,37 @@ fbq('init', '${META_PIXEL_ID}');
 fbq('track', 'PageView');
 `.trim();
 
+/**
+ * Marca o card da loja quando a campanha traz o nome de uma cidade.
+ *
+ * Roda no fim do corpo, depois de os cards existirem e antes da primeira
+ * pintura, então não há salto de layout. Os termos de cada cidade vêm do
+ * atributo data-sinais, preenchido a partir de lib/lojas.ts: nenhuma cidade
+ * está escrita aqui dentro.
+ */
+const DESTAQUE_INLINE = `
+(function () {
+  try {
+    var busca = new URLSearchParams(location.search);
+    var alvo = ((busca.get('utm_campaign') || '') + ' ' + (busca.get('utm_term') || ''))
+      .normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase();
+    if (!alvo) return;
+    var cards = document.querySelectorAll('[data-loja][data-sinais]');
+    for (var i = 0; i < cards.length; i++) {
+      var sinais = cards[i].getAttribute('data-sinais').split('|');
+      for (var j = 0; j < sinais.length; j++) {
+        if (sinais[j] && alvo.indexOf(sinais[j]) !== -1) {
+          cards[i].setAttribute('data-destaque', 'sim');
+          return;
+        }
+      }
+    }
+  } catch (e) {}
+})();
+`.trim();
+
 export const Route = createRootRoute({
+  scripts: () => [{ children: DESTAQUE_INLINE }],
   head: () => ({
     meta: [
       { charSet: "utf-8" },

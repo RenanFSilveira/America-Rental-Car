@@ -2,6 +2,7 @@ node_modules/
 dist/
 .output/
 .wrangler/
+.vercel/
 src/routeTree.gen.ts
 .DS_Store
 

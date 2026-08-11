@@ -1,24 +1,22 @@
-# Publicação na Cloudflare Workers.
+# Publicação alternativa, na Cloudflare. A publicação principal é na Vercel,
+# configurada em vercel.json.
 #
-# ATENÇÃO antes de rodar: o domínio final ainda não está definido, porque
-# depende de acesso ao DNS do lado do cliente. A regra é inegociável: a URL
-# final do anúncio precisa ser um domínio da América. Publicar em
-# *.workers.dev serve só para revisão interna, nunca como destino de anúncio.
+# A página é pré-renderizada em HTML estático, então não existe função de
+# servidor para publicar: é só entregar a pasta dist/client.
 #
 #   npm run build
 #   npx wrangler deploy
 #
-# Depois de o DNS existir, descomente o bloco `routes` e ajuste SITE_URL em
-# src/lib/config.ts para o endereço real.
+# ATENÇÃO antes de trocar o destino dos anúncios: a URL final precisa ser um
+# domínio da América. Um endereço de plataforma (*.workers.dev, *.vercel.app)
+# serve para revisão interna, nunca como destino de anúncio. Ajuste também
+# SITE_URL em src/lib/config.ts quando o domínio existir.
 
 name = "america-rental-car-lp-atendimento"
-main = "dist/server/server.js"
 compatibility_date = "2026-08-11"
-compatibility_flags = ["nodejs_compat"]
 
 [assets]
 directory = "dist/client"
-binding = "ASSETS"
 
 # [[routes]]
 # pattern = "lp.america-rentalcar.com.br"
