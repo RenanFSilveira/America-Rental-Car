@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.output/
+.wrangler/
+src/routeTree.gen.ts
+.DS_Store
+
+# material interno, não vai para o repositório público
+SPEC.md
+RELATORIO.md
+provas/
+.raw/

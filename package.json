@@ -1,0 +1,32 @@
+{
+  "name": "america-rental-car-lp-atendimento",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite dev --port 3000",
+    "build": "vite build",
+    "start": "node scripts/servidor.mjs 3210",
+    "imagens": "node scripts/otimizar-imagens.mjs && node scripts/gerar-og-e-favicon.mjs",
+    "validar": "node scripts/validar.mjs http://localhost:3210",
+    "verificar-tags": "node scripts/verificar-tags.mjs http://localhost:3210",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@tanstack/react-router": "1.170.25",
+    "@tanstack/react-start": "1.168.42",
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "4.3.3",
+    "@types/node": "26.2.0",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.4",
+    "@vitejs/plugin-react": "6.0.5",
+    "puppeteer-core": "25.5.0",
+    "sharp": "0.35.3",
+    "tailwindcss": "4.3.3",
+    "typescript": "5.9.3",
+    "vite": "8.2.1"
+  }
+}
