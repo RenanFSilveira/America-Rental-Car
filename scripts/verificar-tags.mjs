@@ -139,12 +139,17 @@ async function novaAba({ bloquearBibliotecas = false } = {}) {
   await aba.setRequestInterception(true);
   aba.on("request", async (req) => {
     const url = req.url();
-    if (url.includes("wa.me") || url.includes("api.whatsapp.com")) {
-      navegacoes.push({ url, t: Date.now() });
-      return req.abort();
-    }
+    // coleta vem primeiro: o beacon de clique de saída do GA4 carrega a URL do
+    // WhatsApp dentro dele e seria confundido com a navegação
     if (COLETA.some((alvo) => url.includes(alvo))) {
       coleta.push({ url, t: Date.now() });
+      return req.abort();
+    }
+    if (
+      url.startsWith("https://wa.me/") ||
+      url.startsWith("https://api.whatsapp.com/")
+    ) {
+      navegacoes.push({ url, t: Date.now() });
       return req.abort();
     }
     if (bloquearBibliotecas && BIBLIOTECAS.some((alvo) => url.includes(alvo))) {
@@ -172,7 +177,7 @@ async function novaAba({ bloquearBibliotecas = false } = {}) {
 /** Fechar aba pode falhar se a navegação abortada já derrubou o alvo. */
 async function fechar(aba) {
   try {
-    await fechar(aba);
+    await aba.close();
   } catch {
     // alvo já foi embora, nada a fazer
   }
