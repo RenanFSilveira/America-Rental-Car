@@ -19,10 +19,10 @@ npm start          # http://localhost:3210
 | `npm start` | serve o build estático localmente, com gzip e cache iguais aos de produção |
 | `npm run validar` | checklist automatizado: links, tags, peso, conteúdo |
 | `npm run verificar-tags` | prova em navegador de que cada botão dispara a conversão certa |
-| `npm run imagens` | reprocessa as fotos de `.raw/` para `public/` |
+| `npm run imagens` | regenera logo, imagem de compartilhamento e favicon |
 | `npm run typecheck` | conferência de tipos |
 
-As imagens brutas não estão versionadas. Para reconstruí-las a partir do site oficial:
+O logo bruto não está versionado. Para reconstruir as imagens a partir do site oficial:
 
 ```bash
 bash scripts/baixar-imagens.sh
@@ -41,15 +41,14 @@ O build **pré-renderiza a página em HTML estático**. O HTML sai pronto, com t
 src/
   routes/__root.tsx    shell do documento, metadados e tags de rastreamento
   routes/index.tsx     a página
-  components/          Hero, SeletorLoja, Frota, Diferenciais, Empresas, Rodape
+  components/          Hero, SeletorLoja, Empresas, Diferenciais, Rodape
   lib/lojas.ts         fonte única: endereço, telefone, WhatsApp e conversão por loja
-  lib/frota.ts         fonte única: categorias de veículo exibidas
   lib/tracking.ts      origem, código de atendimento e disparo de conversão
   lib/config.ts        identificadores e chaves de configuração
 scripts/               imagens, servidor local e os dois scripts de verificação
 ```
 
-`lib/lojas.ts` e `lib/frota.ts` são fonte única. Nenhum telefone, link ou rótulo de conversão pode aparecer solto em componente.
+`lib/lojas.ts` é fonte única. Nenhum telefone, link ou rótulo de conversão pode aparecer solto em componente.
 
 ## Rastreamento
 
@@ -71,9 +70,9 @@ Todos os endpoints de coleta são bloqueados na camada de rede durante o teste, 
 
 ## Regras de conteúdo
 
-A página não afirma nada que não esteja confirmado na fonte. Sem preço, sem horário de funcionamento, sem prazo de entrega, sem tempo de resposta, sem selo, sem quantidade de veículos, sem anos de mercado. Onde o dado não existe, o assunto simplesmente não aparece.
+A página não afirma nada que não esteja confirmado na fonte. Sem preço, sem horário de funcionamento, sem prazo de entrega, sem tempo de resposta, sem selo, sem quantidade de veículos. Onde o dado não existe, o assunto simplesmente não aparece.
 
-A vitrine mostra 9 das 19 categorias que o site publica. As outras 10 estão listadas em `CATEGORIAS_SEM_FOTO_APROVADA`, em `lib/frota.ts`, cada uma com o motivo: só entram categorias cuja foto mostra veículo de aparência atual. Foto nova destrava cada uma delas.
+O tempo de mercado ("mais de 35 anos") e a composição da frota são afirmações do próprio cliente, enviadas em 17/08/2026, e por isso entram. `scripts/validar.mjs` guarda essa distinção: essas duas passam, qualquer outro número de anos, preço ou selo reprova o build.
 
 ## Desempenho
 
@@ -81,14 +80,14 @@ Medido no Lighthouse mobile, 4G simulado, contra o build de produção:
 
 | Métrica | Valor |
 |:--|:--|
-| Performance | 96 |
+| Performance | 97 |
 | Acessibilidade | 100 |
 | SEO | 100 |
-| LCP | 1,9 s |
+| LCP | 1,6 s |
 | CLS | 0 |
-| Primeira dobra | 115 KB transferidos |
+| Página inteira | 114 KB transferidos |
 
-Sem vídeo, sem autoplay, sem fonte externa. As fotos de frota são `webp` com `jpg` de reserva, com dimensão declarada e carregamento adiado fora da primeira dobra.
+Sem vídeo, sem autoplay, sem fonte externa e sem imagem além do logo: a página toda cabe na primeira dobra.
 
 ## Publicação
 

@@ -1,10 +1,17 @@
 /**
  * Topo da página.
  *
- * Ângulos aprovados no planejamento de agosto: imprevisto não espera, locadora
- * da região com atendimento local, menos burocracia. Sem prazo e sem preço:
- * nenhum dos dois está confirmado com o cliente.
+ * Os três pontos abaixo do título são texto do cliente, enviado em 17/08/2026.
+ * O "mais de 35 anos" é afirmação dele sobre o próprio negócio, então é fato
+ * declarado na fonte, não estimativa nossa. Continua valendo o resto: sem
+ * preço, sem prazo, sem horário.
  */
+const PONTOS = [
+  "Locadora de veículos com mais de 35 anos de experiência no segmento",
+  "Frota diversificada: encontre o veículo ideal para a sua necessidade",
+  "Atendimento personalizado",
+] as const;
+
 export function Hero() {
   return (
     <header className="bg-marca text-white">
@@ -26,17 +33,22 @@ export function Hero() {
           Imprevisto não espera. Fale agora com a loja mais perto de você.
         </h1>
 
-        <p className="mt-4 max-w-2xl text-lg text-white/90">
-          Vila Velha, Vitória e Guarapari. Você conversa direto com a equipe da
-          unidade que vai entregar o carro, pelo WhatsApp, sem formulário e sem
-          intermediário.
-        </p>
+        <ul className="mt-6 flex max-w-2xl flex-col gap-2 text-lg text-white/90">
+          {PONTOS.map((ponto) => (
+            <li key={ponto} className="flex gap-3">
+              <span aria-hidden="true" className="mt-1 shrink-0 text-white/70">
+                ✓
+              </span>
+              {ponto}
+            </li>
+          ))}
+        </ul>
 
         <a
           href="#lojas"
           className="text-marca mt-8 inline-flex items-center gap-2 rounded-xl bg-white px-6 py-4 text-base font-semibold transition-colors hover:bg-white/90"
         >
-          Escolher a loja e falar no WhatsApp
+          Escolha a loja e fale no WhatsApp
           <span aria-hidden="true">↓</span>
         </a>
       </div>

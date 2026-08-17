@@ -6,7 +6,7 @@
     "dev": "vite dev --port 3000",
     "build": "vite build",
     "start": "node scripts/servidor.mjs 3210",
-    "imagens": "node scripts/otimizar-imagens.mjs && node scripts/gerar-og-e-favicon.mjs",
+    "imagens": "node scripts/imagens.mjs",
     "validar": "node scripts/validar.mjs http://localhost:3210",
     "verificar-tags": "node scripts/verificar-tags.mjs http://localhost:3210",
     "typecheck": "tsc --noEmit"

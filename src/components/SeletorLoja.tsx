@@ -23,11 +23,6 @@ export function SeletorLoja() {
       <h2 className="text-2xl font-bold sm:text-3xl">
         Escolha a loja e fale agora
       </h2>
-      <p className="text-tinta-suave mt-2 max-w-2xl">
-        Cada loja tem o próprio WhatsApp e a própria equipe. Quem responde é
-        quem entrega o carro.
-      </p>
-
       <ul className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {LOJAS.map((loja) => (
           <li

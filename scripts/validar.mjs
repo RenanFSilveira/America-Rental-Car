@@ -139,17 +139,25 @@ escritaDeUtm.length === 0
 
 /* ---------------- conteúdo ---------------- */
 
+// "mais de 35 anos" é afirmação do próprio cliente, enviada em 17/08/2026, e
+// por isso é permitida. Qualquer outro número de anos continua barrado, assim
+// como preço, horário e selo, que seguem sem fonte.
+const conteudoAprovado = [/mais de 35 anos/i, /\+35 anos/i];
 const proibidos = [
   /\bR\$\s?\d/,
   /\b24\s?h(oras)?\b/i,
-  /\bh[áa]\s+(mais\s+de\s+)?\d+\s+anos\b/i,
+  /\b\d+\s+anos\b/i,
   /\b\d+\s*(estrelas|avalia)/i,
   /\bISO\s?9001\b/i,
 ];
 const conteudoVisivel = html
   .replace(/<script[\s\S]*?<\/script>/g, "")
   .replace(/<[^>]+>/g, " ");
-const achouProibido = proibidos.filter((r) => r.test(conteudoVisivel));
+const semAprovados = conteudoAprovado.reduce(
+  (texto, aprovado) => texto.replace(new RegExp(aprovado, "gi"), ""),
+  conteudoVisivel,
+);
+const achouProibido = proibidos.filter((r) => r.test(semAprovados));
 achouProibido.length === 0
   ? ok("Sem preço, horário ou número inventado no texto visível")
   : falha(
@@ -192,18 +200,16 @@ primeiraDobra < 400 * 1024
       `${(primeiraDobra / 1024).toFixed(1)} KB`,
     );
 
-const frota = await readdir(path.join(raiz, "public", "frota"));
-let pesoFrota = 0;
-for (const arquivo of frota.filter((f) => f.endsWith(".webp"))) {
-  pesoFrota += (await stat(path.join(raiz, "public", "frota", arquivo))).size;
-}
-const pesoTotal = primeiraDobra + pesoFrota;
-pesoTotal < 1.2 * 1024 * 1024
+// a vitrine de frota saiu da página, então não há mais imagem abaixo da dobra
+primeiraDobra < 1.2 * 1024 * 1024
   ? ok(
       "Página inteira abaixo de 1,2 MB",
-      `${(pesoTotal / 1024).toFixed(1)} KB com as ${frota.filter((f) => f.endsWith(".webp")).length} fotos de frota`,
+      `${(primeiraDobra / 1024).toFixed(1)} KB, a página toda cabe na primeira dobra`,
     )
-  : falha("Página inteira abaixo de 1,2 MB", `${(pesoTotal / 1024).toFixed(1)} KB`);
+  : falha(
+      "Página inteira abaixo de 1,2 MB",
+      `${(primeiraDobra / 1024).toFixed(1)} KB`,
+    );
 
 // "autoPlay" aparece na lista interna de atributos do react-dom, então essa
 // palavra só é procurada no nosso código; mídia de verdade é procurada em tudo.

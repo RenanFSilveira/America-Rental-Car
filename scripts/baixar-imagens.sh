@@ -1,39 +1,17 @@
 #!/usr/bin/env bash
-# Baixa as imagens brutas do site oficial para .raw/.
+# Baixa o logo oficial para .raw/, que é a origem das imagens da página.
 #
-# Roda uma vez. A triagem do que entra na página está em src/lib/frota.ts e em
-# scripts/otimizar-imagens.mjs. As imagens reprovadas continuam em .raw/ de
-# propósito, para o próximo a revisar poder conferir o critério.
+# A vitrine de frota saiu da página a pedido do cliente em 17/08/2026, então o
+# download das fotos de veículo não é mais necessário. O histórico do git
+# guarda a versão que baixava a frota inteira, caso a seção volte.
 #
-# Uso: bash scripts/baixar-imagens.sh
+# Uso: bash scripts/baixar-imagens.sh && node scripts/imagens.mjs
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
-mkdir -p .raw/frota .raw/lojas
+mkdir -p .raw
 
-ORIGEM="https://america-rentalcar.com.br"
-
-# A extensão varia por arquivo, então tenta as duas e guarda a que responder 200
-for slug in a c c1 d d1 e f g h1 h2 h3 i j k l l1 m n1 p; do
-  for ext in png jpg; do
-    destino=".raw/frota/${slug}.${ext}"
-    codigo=$(curl -sL -o "$destino" -w "%{http_code}" --max-time 20 \
-      "${ORIGEM}/images/veiculos/${slug}.${ext}")
-    if [ "$codigo" = "200" ]; then
-      echo "ok  ${destino}  $(wc -c < "$destino") bytes"
-    else
-      rm -f "$destino"
-    fi
-  done
-done
-
-for arquivo in logo.png vitoria.png vilavelha.png guarapari.png; do
-  curl -sL -o ".raw/lojas/${arquivo}" --max-time 20 "${ORIGEM}/images/${arquivo}"
-done
-
-for numero in 4 5 6; do
-  curl -sL -o ".raw/lojas/banner${numero}.jpg" --max-time 25 \
-    "${ORIGEM}/images/main-slider/banner${numero}.jpg"
-done
+curl -sL -o .raw/logo.png --max-time 20 "https://america-rentalcar.com.br/images/logo.png"
+echo "ok  .raw/logo.png  $(wc -c < .raw/logo.png) bytes"
 
 echo "Pronto. Agora: npm run imagens"

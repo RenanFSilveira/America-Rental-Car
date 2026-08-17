@@ -3,7 +3,6 @@ import { useEffect } from "react";
 
 import { Diferenciais } from "~/components/Diferenciais";
 import { Empresas } from "~/components/Empresas";
-import { Frota } from "~/components/Frota";
 import { Hero } from "~/components/Hero";
 import { Rodape } from "~/components/Rodape";
 import { SeletorLoja } from "~/components/SeletorLoja";
@@ -47,9 +46,8 @@ function Pagina() {
     <main>
       <Hero />
       <SeletorLoja />
-      <Frota />
-      <Diferenciais />
       <Empresas />
+      <Diferenciais />
       <Rodape />
     </main>
   );

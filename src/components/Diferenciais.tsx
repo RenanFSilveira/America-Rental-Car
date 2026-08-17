@@ -1,23 +1,29 @@
 /**
- * Diferenciais. Só o que se sustenta com o que está confirmado:
- * operação local no ES, atendimento direto por WhatsApp, processo simples.
- * Sem prazo de entrega, sem tempo de resposta, sem selo.
+ * Diferenciais.
+ *
+ * Texto enviado pelo cliente em 17/08/2026, substituindo a versão anterior.
+ * O tempo de mercado e a composição da frota são afirmações dele sobre o
+ * próprio negócio. Continua sem preço, sem horário e sem prazo, que seguem
+ * não confirmados.
  */
 const ITENS = [
   {
-    titulo: "Locadora daqui, não uma central de atendimento",
-    texto:
-      "A América é capixaba e tem loja e equipe próprias em Vila Velha, Vitória e Guarapari. Quem atende conhece a região, o trânsito e a distância que você vai percorrer.",
+    titulo: "+35 anos de experiência",
+    texto: "Experiência em locação de veículos para pessoas e empresas.",
   },
   {
-    titulo: "Conversa direta com a unidade",
+    titulo: "Frota diversificada",
     texto:
-      "O número que você aciona é o da loja que vai entregar o carro. Sua solicitação não passa por uma fila de central nem por um formulário que alguém retorna depois.",
+      "Veículos econômicos, SUVs, executivos, pickups, furgões, vans e utilitários.",
   },
   {
-    titulo: "Menos burocracia para resolver",
+    titulo: "3 lojas no Espírito Santo",
+    texto: "Pontos de atendimento em Vila Velha, Vitória e Guarapari.",
+  },
+  {
+    titulo: "Atendimento próximo",
     texto:
-      "Você diz o que precisa e para quando, e combina retirada e devolução na própria conversa. Sem cadastro obrigatório antes de falar com alguém.",
+      "Aqui, você fala com pessoas. Nossa equipe entende sua necessidade e ajuda a encontrar a melhor solução para a sua locação.",
   },
 ] as const;
 
@@ -28,7 +34,7 @@ export function Diferenciais() {
         Por que alugar com a América
       </h2>
 
-      <ul className="mt-8 grid gap-6 sm:grid-cols-3">
+      <ul className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {ITENS.map((item) => (
           <li key={item.titulo}>
             <div className="bg-marca h-1 w-10 rounded-full" />
