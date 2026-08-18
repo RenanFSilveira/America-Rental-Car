@@ -3,8 +3,10 @@
  *
  * A linha de apoio e o título saíram a pedido do cliente em 18/08/2026, então o
  * topo passou a ser marca, três pontos de apoio e a chamada para a ação. Sem
- * título aqui, o <h1> da página passou a ser o da seção de escolha de loja
- * (components/SeletorLoja.tsx): a página precisa ter um, e só um.
+ * título aqui, quem assume o papel de <h1> é o primeiro ponto de apoio: ele
+ * carrega "locadora de veículos", que é o termo que a pessoa pesquisou, e é
+ * texto do próprio cliente. Numa página de destino de anúncio isso importa,
+ * porque o rastreador lê o <h1> para entender do que a página trata.
  *
  * Os três pontos são texto do cliente, enviado em 17/08/2026.
  * O "mais de 35 anos" é afirmação dele sobre o próprio negócio, então é fato
@@ -16,6 +18,14 @@ const PONTOS = [
   "Frota diversificada: encontre o veículo ideal para a sua necessidade",
   "Atendimento personalizado",
 ] as const;
+
+function Marca() {
+  return (
+    <span aria-hidden="true" className="mt-1 shrink-0 text-white/70">
+      ✓
+    </span>
+  );
+}
 
 export function Hero() {
   return (
@@ -30,16 +40,27 @@ export function Hero() {
           fetchPriority="high"
         />
 
-        <ul className="mt-8 flex max-w-2xl flex-col gap-3 text-lg text-white/95 sm:text-xl">
-          {PONTOS.map((ponto) => (
-            <li key={ponto} className="flex gap-3">
-              <span aria-hidden="true" className="mt-1 shrink-0 text-white/70">
-                ✓
-              </span>
-              {ponto}
-            </li>
-          ))}
-        </ul>
+        <div className="mt-8 flex max-w-2xl flex-col gap-3 text-lg text-white/95 sm:text-xl">
+          {/* o primeiro ponto é o <h1> da página. Ele carrega "locadora de
+              veículos", que é o que a pessoa pesquisou, e é texto do próprio
+              cliente. O peso e o tamanho são os mesmos dos outros dois: a
+              mudança é de marcação, não de aparência. */}
+          <div className="flex gap-3">
+            <Marca />
+            {/* o sinal fica fora do h1 de propósito: dentro, o rastreador
+                leria o caractere colado no começo do título */}
+            <h1 className="font-normal">{PONTOS[0]}</h1>
+          </div>
+
+          <ul className="flex flex-col gap-3">
+            {PONTOS.slice(1).map((ponto) => (
+              <li key={ponto} className="flex gap-3">
+                <Marca />
+                {ponto}
+              </li>
+            ))}
+          </ul>
+        </div>
 
         <a
           href="#lojas"

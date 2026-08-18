@@ -20,11 +20,9 @@ import { LOJAS } from "~/lib/lojas";
 export function SeletorLoja() {
   return (
     <section id="lojas" className="mx-auto max-w-5xl px-5 py-12 sm:py-16">
-      {/* é o <h1> da página desde que o título do topo saiu, em 18/08/2026.
-          O tamanho na tela continua o mesmo: a mudança é só de semântica. */}
-      <h1 className="text-2xl font-bold sm:text-3xl">
+      <h2 className="text-2xl font-bold sm:text-3xl">
         Escolha a loja e fale agora
-      </h1>
+      </h2>
       <ul className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {LOJAS.map((loja) => (
           <li
@@ -37,9 +35,7 @@ export function SeletorLoja() {
               Loja da sua busca
             </span>
 
-            {/* h2 e não h3: o título da seção virou o h1 da página, então
-                pular um nível aqui quebraria a ordem dos cabeçalhos */}
-            <h2 className="text-marca text-xl font-bold">{loja.nome}</h2>
+            <h3 className="text-marca text-xl font-bold">{loja.nome}</h3>
 
             <address className="text-tinta-suave mt-2 text-sm not-italic">
               {loja.endereco}
