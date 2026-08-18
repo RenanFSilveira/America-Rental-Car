@@ -1,7 +1,12 @@
 /**
  * Topo da página.
  *
- * Os três pontos abaixo do título são texto do cliente, enviado em 17/08/2026.
+ * A linha de apoio e o título saíram a pedido do cliente em 18/08/2026, então o
+ * topo passou a ser marca, três pontos de apoio e a chamada para a ação. Sem
+ * título aqui, o <h1> da página passou a ser o da seção de escolha de loja
+ * (components/SeletorLoja.tsx): a página precisa ter um, e só um.
+ *
+ * Os três pontos são texto do cliente, enviado em 17/08/2026.
  * O "mais de 35 anos" é afirmação dele sobre o próprio negócio, então é fato
  * declarado na fonte, não estimativa nossa. Continua valendo o resto: sem
  * preço, sem prazo, sem horário.
@@ -25,15 +30,7 @@ export function Hero() {
           fetchPriority="high"
         />
 
-        <p className="mt-8 text-sm font-semibold tracking-wide text-white/80 uppercase">
-          Locadora capixaba, com loja própria em três cidades
-        </p>
-
-        <h1 className="mt-3 text-3xl leading-tight font-bold text-balance sm:text-5xl">
-          Imprevisto não espera. Fale agora com a loja mais perto de você.
-        </h1>
-
-        <ul className="mt-6 flex max-w-2xl flex-col gap-2 text-lg text-white/90">
+        <ul className="mt-8 flex max-w-2xl flex-col gap-3 text-lg text-white/95 sm:text-xl">
           {PONTOS.map((ponto) => (
             <li key={ponto} className="flex gap-3">
               <span aria-hidden="true" className="mt-1 shrink-0 text-white/70">

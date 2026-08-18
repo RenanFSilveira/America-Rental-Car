@@ -4,10 +4,10 @@ import { EMPRESAS } from "~/lib/lojas";
 /**
  * Bloco B2B.
  *
- * O cliente pediu, em 17/08/2026, que ficasse logo abaixo da escolha de loja.
- * O tratamento visual continua contido de propósito (botão de contorno, bloco
- * baixo): o canal de empresas já consumiu verba nesta conta sem retorno, então
- * ele existe para não perder quem chega, sem competir com a ação principal.
+ * O cliente pediu, em 17/08/2026, que ficasse logo abaixo da escolha de loja, e
+ * em 18/08/2026 que o botão ficasse verde com letra branca, igual aos das lojas.
+ * O bloco em si segue baixo e sem imagem, o que ainda o mantém abaixo da ação
+ * principal na hierarquia da página.
  */
 export function Empresas() {
   return (
@@ -26,7 +26,6 @@ export function Empresas() {
           sendTo={EMPRESAS.sendTo}
           loja={EMPRESAS.slug}
           rotulo="Falar com o Atendimento Corporativo"
-          variante="contorno"
           className="sm:w-auto sm:shrink-0"
         />
       </div>
