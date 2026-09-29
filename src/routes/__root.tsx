@@ -93,7 +93,6 @@ export const Route = createRootRoute({
       { name: "twitter:image", content: `${SITE_URL}/og.jpg` },
     ],
     links: [
-      { rel: "canonical", href: SITE_URL },
       { rel: "icon", href: "/favicon.png", type: "image/png" },
       { rel: "preconnect", href: "https://www.googletagmanager.com" },
       { rel: "preload", as: "image", href: "/logo.webp" },

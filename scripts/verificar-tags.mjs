@@ -346,6 +346,92 @@ async function provaDeCodigo(caso) {
   await fechar(aba);
 }
 
+/**
+ * Formulário de /empresas: prova de rede em passe único.
+ *
+ * O mecanismo (irParaWhatsApp) já está provado pelos 4 casos de ESPERADO
+ * acima — este caso prova só o que é específico do formulário: que os três
+ * campos digitados chegam na mensagem do WhatsApp, na conversão certa, antes
+ * da navegação.
+ */
+async function provaDoFormularioEmpresas() {
+  const { aba, coleta, navegacoes } = await novaAba();
+  await aba.goto(
+    `${ORIGEM}/empresas?gclid=TESTE789&utm_source=google&utm_medium=cpc`,
+    { waitUntil: "networkidle2" },
+  );
+
+  await aba.waitForSelector("#nome-empresa", { timeout: 10000 });
+  await new Promise((r) => setTimeout(r, 200)); // margem para a hidratação
+  await aba.type("#nome-empresa", "Maria Teste");
+  await aba.type("#nome-da-empresa", "Empresa Teste LTDA");
+  await aba.select("#necessidade", "frota");
+  await aba.click('button[type="submit"]');
+  await new Promise((r) => setTimeout(r, 1500));
+
+  const etiqueta = "mZ5XCPrsuKUcEJzQmJ0D";
+  const conversao = coleta.find(
+    (r) => r.url.includes("866527260") && r.url.includes(etiqueta),
+  );
+  conversao
+    ? ok(
+        "Empresas (formulário): conversão do Google Ads sai com o rótulo certo",
+        `${etiqueta} em ${new URL(conversao.url).host}${new URL(conversao.url).pathname}`,
+      )
+    : falha(
+        "Empresas (formulário): conversão do Google Ads sai com o rótulo certo",
+        `nenhuma requisição com ${etiqueta}`,
+      );
+
+  const navegacao = navegacoes.find((n) => n.url.includes("5527988801118"));
+  navegacao
+    ? ok("Empresas (formulário): navega para o WhatsApp certo", navegacao.url)
+    : falha(
+        "Empresas (formulário): navega para o WhatsApp certo",
+        "sem navegação para 5527988801118",
+      );
+
+  if (navegacao && conversao) {
+    navegacao.t >= conversao.t
+      ? ok(
+          "Empresas (formulário): conversão antes da navegação",
+          `navegação ${navegacao.t - conversao.t}ms depois da conversão`,
+        )
+      : falha(
+          "Empresas (formulário): conversão antes da navegação",
+          `navegou ${conversao.t - navegacao.t}ms antes de a conversão sair`,
+        );
+  }
+
+  const texto = navegacao
+    ? decodeURIComponent(navegacao.url.split("?text=")[1] ?? "")
+    : "";
+
+  texto.includes("Maria Teste")
+    ? ok("Empresas (formulário): nome digitado chega na mensagem")
+    : falha("Empresas (formulário): nome digitado chega na mensagem", texto);
+
+  texto.includes("Empresa Teste LTDA")
+    ? ok("Empresas (formulário): empresa digitada chega na mensagem")
+    : falha(
+        "Empresas (formulário): empresa digitada chega na mensagem",
+        texto,
+      );
+
+  texto.includes("Terceirização de frota")
+    ? ok("Empresas (formulário): necessidade selecionada chega na mensagem")
+    : falha(
+        "Empresas (formulário): necessidade selecionada chega na mensagem",
+        texto,
+      );
+
+  /^AR-[A-Z2-9]{7}$/.test(texto.match(/atendimento #(AR-[A-Z2-9]{7})/)?.[1] ?? "")
+    ? ok("Empresas (formulário): código de atendimento na mensagem")
+    : falha("Empresas (formulário): código de atendimento na mensagem", texto);
+
+  await fechar(aba);
+}
+
 /** Origem, código de atendimento e destaque de loja por UTM. */
 async function testarOrigemECodigo() {
   const { aba, coleta } = await novaAba();
@@ -447,20 +533,22 @@ async function testarSemJavaScript() {
 }
 
 async function tirarPrints() {
-  for (const [nome, largura, altura] of [
-    ["celular", 390, 844],
-    ["celular-320", 320, 720],
-    ["desktop", 1280, 900],
+  for (const [nome, largura, altura, rota] of [
+    ["celular", 390, 844, ""],
+    ["celular-320", 320, 720, ""],
+    ["desktop", 1280, 900, ""],
+    ["empresas-celular", 390, 844, "/empresas"],
+    ["empresas-desktop", 1280, 900, "/empresas"],
   ]) {
     const { aba } = await novaAba();
     await aba.setViewport({ width: largura, height: altura });
-    await aba.goto(ORIGEM, { waitUntil: "networkidle2" });
+    await aba.goto(`${ORIGEM}${rota}`, { waitUntil: "networkidle2" });
 
     (await aba.evaluate(
       () => document.documentElement.scrollWidth > window.innerWidth + 1,
     ))
-      ? falha(`sem rolagem horizontal em ${largura}px`)
-      : ok(`sem rolagem horizontal em ${largura}px`);
+      ? falha(`sem rolagem horizontal em ${largura}px${rota}`)
+      : ok(`sem rolagem horizontal em ${largura}px${rota}`);
 
     await aba.screenshot({
       path: path.join(provas, `pagina-${nome}.png`),
@@ -484,6 +572,7 @@ try {
     await provaDeRede(caso);
     await provaDeCodigo(caso);
   }
+  await provaDoFormularioEmpresas();
   await testarOrigemECodigo();
   await testarSemJavaScript();
   await tirarPrints();

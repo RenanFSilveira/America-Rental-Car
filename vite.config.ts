@@ -20,7 +20,7 @@ export default defineConfig({
     // virou um script curto no fim do corpo (routes/__root.tsx).
     tanstackStart({
       prerender: { enabled: true, failOnError: true },
-      pages: [{ path: "/" }],
+      pages: [{ path: "/" }, { path: "/empresas" }],
     }),
     viteReact(),
   ],

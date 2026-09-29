@@ -32,6 +32,12 @@ const DADOS_ESTRUTURADOS = JSON.stringify({
 
 export const Route = createFileRoute("/")({
   head: () => ({
+    // canonical fica na rota, não em __root.tsx: TanStack Router concatena
+    // `links` em vez de sobrescrever por chave (diferente de `meta`, que
+    // dedupe por name/property). Com o canonical no root, toda rota nova
+    // herdava o dele e a página saía com dois <link rel="canonical">. Ver
+    // routes/empresas.tsx para o mesmo padrão.
+    links: [{ rel: "canonical", href: SITE_URL }],
     scripts: [{ type: "application/ld+json", children: DADOS_ESTRUTURADOS }],
   }),
   component: Pagina,

@@ -185,6 +185,24 @@ export function linkWhatsApp(numero: string, codigo?: string): string {
   return `https://wa.me/${numero}?text=${encodeURIComponent(texto)}`;
 }
 
+/**
+ * Mesma regra de linkWhatsApp, com mensagem própria em vez da MENSAGEM_BASE.
+ *
+ * Usado pelo formulário de empresas: a mensagem carrega o que a pessoa
+ * digitou (nome, empresa, necessidade), então só pode ser montada depois da
+ * hidratação, diferente do link fixo dos botões de loja. Por isso este
+ * caminho depende de JavaScript — não existe versão estática equivalente,
+ * porque HTML puro não sabe combinar três campos numa única query string.
+ */
+export function linkWhatsAppComMensagem(
+  numero: string,
+  mensagem: string,
+  codigo?: string,
+): string {
+  const texto = codigo ? `${mensagem} (atendimento #${codigo})` : mensagem;
+  return `https://wa.me/${numero}?text=${encodeURIComponent(texto)}`;
+}
+
 /* ------------------------------------------------------------------ */
 /* Registro (opcional)                                                 */
 /* ------------------------------------------------------------------ */

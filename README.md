@@ -1,8 +1,9 @@
-# América Rental Car: página de atendimento
+# América Rental Car: páginas de destino
 
-Página única de destino para os anúncios de busca da [América Rental Car](https://america-rentalcar.com.br), locadora de veículos com loja própria em Vila Velha, Vitória e Guarapari (ES).
+Páginas de destino para os anúncios de busca da [América Rental Car](https://america-rentalcar.com.br), locadora de veículos com loja própria em Vila Velha, Vitória e Guarapari (ES). Duas rotas, um projeto:
 
-O trabalho da página é um só: levar quem clicou no anúncio até o WhatsApp da loja certa, o mais rápido possível, disparando a conversão correta no caminho.
+- **`/`** — consumidor final. Leva quem clicou no anúncio até o WhatsApp da loja certa, o mais rápido possível, disparando a conversão correta no caminho.
+- **`/empresas`** — campanha B2B dedicada (29/09/2026), separada da campanha de loja porque a página de consumidor "fala com tudo", não só com empresa (decisão do Renan com o cliente em 22/09/2026). Formulário curto (nome, empresa, necessidade) que monta a mensagem e reusa o mesmo mecanismo de conversão. Ver seção "Página de empresas" abaixo.
 
 ## Como rodar
 
@@ -40,8 +41,11 @@ O build **pré-renderiza a página em HTML estático**. O HTML sai pronto, com t
 ```
 src/
   routes/__root.tsx    shell do documento, metadados e tags de rastreamento
-  routes/index.tsx     a página
+  routes/index.tsx     página de consumidor final ("/")
+  routes/empresas.tsx  página de empresas ("/empresas")
   components/          Hero, SeletorLoja, Empresas, Diferenciais, Rodape
+                        HeroEmpresas, NecessidadesEmpresas, DiferenciaisEmpresas,
+                        FormularioEmpresas, FaqEmpresas
   lib/lojas.ts         fonte única: endereço, telefone, WhatsApp e conversão por loja
   lib/tracking.ts      origem, código de atendimento e disparo de conversão
   lib/config.ts        identificadores e chaves de configuração
@@ -49,6 +53,8 @@ scripts/               imagens, servidor local e os dois scripts de verificaçã
 ```
 
 `lib/lojas.ts` é fonte única. Nenhum telefone, link ou rótulo de conversão pode aparecer solto em componente.
+
+Cada rota declara seu próprio `title`, `description` e `link rel="canonical"` no `head()` do arquivo em `routes/`, nunca em `__root.tsx`: o TanStack Router dedupe `meta` por `name`/`property` (a rota filha substitui a raiz), mas **concatena `links`** em vez de substituir — um canonical fixo em `__root.tsx` sairia duplicado em toda rota nova. Ver o comentário em `routes/index.tsx`.
 
 ## Rastreamento
 
@@ -88,6 +94,20 @@ Medido no Lighthouse mobile, 4G simulado, contra o build de produção:
 | Página inteira | 114 KB transferidos |
 
 Sem vídeo, sem autoplay, sem fonte externa e sem imagem além do logo: a página toda cabe na primeira dobra.
+
+## Página de empresas (`/empresas`)
+
+Adicionada em 29/09/2026, registrada em `vite.config.ts` (`pages: [{ path: "/" }, { path: "/empresas" }]`) — sem essa entrada o build não pré-renderiza a rota e ela quebraria em produção, mesmo funcionando normalmente em `npm run dev`.
+
+**Formulário em vez de botão direto.** Decisão do cliente: nome, empresa e "o que sua empresa precisa" (mínimo direcionamento para o atendente, não um funil de qualificação). No envio, monta a mensagem e chama o mesmo `irParaWhatsApp` de `lib/tracking.ts` — mesma conversão (`AW-866527260/mZ5XCPrsuKUcEJzQmJ0D`, a mesma que o bloco "Empresas" da raiz já usa) e o mesmo evento de GA4 dos outros botões.
+
+**Isso quebra o padrão "funciona sem JavaScript" do resto do site.** A mensagem só existe depois de combinar três campos digitados, e HTML puro não sabe fazer isso — não existe fallback estático equivalente ao dos botões de loja. Por isso o formulário tem, logo abaixo, um `BotaoWhatsApp` de reforço (mensagem genérica, sem os três campos) que funciona do jeito antigo. `npm run validar` confere que esse link está no HTML servido.
+
+**Conteúdo.** Segue a mesma regra da raiz — nada sem fonte confirmada. Os diferenciais reaproveitam fatos já validados pelo cliente (17/08/2026: "+35 anos", frota incluindo furgões e vans) e a alavanca de operação local contra redes nacionais, que é texto de `perfil.md`, não copy nova. Onde a condição comercial não está confirmada (o que entra no contrato de terceirização, manutenção, prazo mínimo), a página não afirma — direciona para "fale com o atendimento corporativo" em vez de prometer. O FAQ corrige de propósito a expectativa de atendimento fora do ES: os termos de busca que o cliente repassou (22/09/2026) incluem variações "Bahia", "MG" e "Brasil", mas a operação confirmada é só Vila Velha, Vitória e Guarapari.
+
+**Pendência que fica registrada aqui, não resolvida:** `perfil.md` tem uma regra CRÍTICA de que B2B só pode ser reaberto com canal novo, teto de verba próprio e critério de corte declarado por escrito — histórico da conta é R$ 13.583 investidos em 3-4 tentativas de B2B no Google Search, zero conversão. A campanha combinada em 22/09/2026 reorganiza o mesmo canal (Google Search), não abre canal novo, e o teto/corte não foi declarado nesta entrega (decisão explícita: só a página, por ora). Esta página reduz risco de leilão (ver seção 7 de `RELATORIO.md`), mas não substitui essa declaração pendente.
+
+**Verificação.** `npm run verificar-tags` ganhou um caso dedicado (`provaDoFormularioEmpresas`): preenche os três campos de verdade num Chrome headless, confere que a conversão sai com o rótulo certo antes da navegação, e que nome/empresa/necessidade chegam decodificados na mensagem do WhatsApp. `npm run validar` ganhou os mesmos checks de conteúdo e um check de canonical único (ver nota na seção Estrutura). Capturas em `provas/pagina-empresas-celular.png` e `provas/pagina-empresas-desktop.png`.
 
 ## Publicação
 

@@ -173,6 +173,43 @@ html.includes("@Lovable") || html.toLowerCase().includes("lovable")
   ? falha("Sem resquício do repo de referência", "menção a Lovable no HTML")
   : ok("Sem resquício do repo de referência");
 
+/* ---------------- /empresas ---------------- */
+
+// Mesma disciplina de conteúdo da raiz, aplicada à página de empresas.
+// Não repete os checks de rastreamento (o rótulo de conversão é o mesmo
+// AW-866527260/mZ5XCPrsuKUcEJzQmJ0D, já coberto acima) nem os de peso (a
+// página compartilha o bundle principal com a raiz).
+const htmlEmpresas = await (await fetch(`${base}/empresas`)).text();
+
+htmlEmpresas.includes("https://wa.me/5527988801118")
+  ? ok(
+      "Empresas: link direto de reforço no HTML servido",
+      "cobre quem estiver sem JavaScript",
+    )
+  : falha(
+      "Empresas: link direto de reforço no HTML servido",
+      "wa.me/5527988801118 ausente — formulário ficaria sem alternativa sem JS",
+    );
+
+const conteudoVisivelEmpresas = htmlEmpresas
+  .replace(/<script[\s\S]*?<\/script>/g, "")
+  .replace(/<[^>]+>/g, " ");
+const semAprovadosEmpresas = conteudoAprovado.reduce(
+  (texto, aprovado) => texto.replace(new RegExp(aprovado, "gi"), ""),
+  conteudoVisivelEmpresas,
+);
+const achouProibidoEmpresas = proibidos.filter((r) => r.test(semAprovadosEmpresas));
+achouProibidoEmpresas.length === 0
+  ? ok("Empresas: sem preço, horário ou número inventado no texto visível")
+  : falha(
+      "Empresas: sem preço, horário ou número inventado no texto visível",
+      achouProibidoEmpresas.map(String).join(", "),
+    );
+
+htmlEmpresas.includes('rel="canonical" href="https://lp.america-rentalcar.com.br/empresas"')
+  ? ok("Empresas: canonical próprio, sem duplicar o da raiz")
+  : falha("Empresas: canonical próprio, sem duplicar o da raiz");
+
 /* ---------------- peso ---------------- */
 
 const pesoHtml = Buffer.byteLength(html);
